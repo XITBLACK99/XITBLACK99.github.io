@@ -3,150 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saturno - Mi Universo</title>
+    <title>Universo para Mi Reyna</title>
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background: #020205 url('https://w.wallhaven.cc/full/8o/wallhaven-8o9m8y.jpg') no-repeat center center fixed;
-            background-size: cover;
+            background: #000000;
             overflow: hidden;
             display: flex; justify-content: center; align-items: center;
             font-family: 'Arial', sans-serif;
-            perspective: 1200px; /* Esto da la profundidad del video */
+            perspective: 1200px;
+        }
+
+        #star-field {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+        }
+
+        .static-star {
+            position: absolute; background: white; border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        /* ESTRELLAS FUGACES INDIVIDUALES */
+        .shooting-star {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0), #ffffff);
+            border-radius: 999px;
+            filter: drop-shadow(0 0 10px #ffffff);
+            z-index: 5;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes shooting {
+            0% { transform: translateX(0) translateY(0) rotate(35deg); opacity: 0; width: 0; }
+            10% { opacity: 1; }
+            30% { width: 180px; opacity: 1; }
+            100% { transform: translateX(1000px) translateY(600px) rotate(35deg); opacity: 0; width: 0; }
         }
 
         #play-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 9999; color: white; cursor: pointer;
+            position: fixed; z-index: 100; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98); display: flex; justify-content: center; align-items: center;
+            cursor: pointer;
         }
 
         .btn-play {
-            padding: 18px 50px; font-size: 22px; background: #ff007f;
-            border: none; border-radius: 50px; color: white;
-            box-shadow: 0 0 40px #ff007f; cursor: pointer;
-            font-weight: bold; animation: pulse 2s infinite;
+            padding: 15px 45px; font-size: 22px; background: #ff007f; border: none;
+            border-radius: 50px; color: white; box-shadow: 0 0 40px #ff007f; font-weight: bold;
         }
 
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-
-        /* Contenedor del Universo */
-        .universe-3d { 
-            position: relative; width: 800px; height: 800px; 
-            transform: rotateX(70deg) rotateY(10deg); /* Inclinación tipo Saturno */
-            transform-style: preserve-3d; 
-            display: none; 
+        .universe {
+            position: relative; width: 100%; height: 100%;
+            display: none; justify-content: center; align-items: center;
+            transform-style: preserve-3d; transform: scale(0.6); z-index: 10;
         }
 
-        /* El Sol / Planeta Central */
-        .sun { 
-            position: absolute; top: 50%; left: 50%; width: 100px; height: 100px; 
-            background: radial-gradient(circle, #fff, #ffb6c1, #ff007f); 
+        .planet {
+            position: absolute; width: 160px; height: 160px;
+            background: radial-gradient(circle at 30% 30%, #fff, #ffb6c1, #ff007f, #4b0026);
+            border-radius: 50%; z-index: 20;
+            box-shadow: 0 0 80px rgba(255, 0, 127, 0.9), inset -10px -10px 20px rgba(0,0,0,0.6);
+        }
+
+        .orbit-system {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            transform: rotateX(75deg); transform-style: preserve-3d;
+        }
+
+        /* 12 ANILLOS VISIBLES */
+        .orbit {
+            position: absolute; 
+            border: 1.8px solid rgba(255, 255, 255, 0.3); 
             border-radius: 50%; 
-            transform: translate(-50%, -50%) rotateX(-70deg); 
-            box-shadow: 0 0 80px #fff, 0 0 150px #ff007f; 
+            transform-style: preserve-3d;
+            animation: rotateOrbit linear infinite;
         }
 
-        /* Órbitas */
-        .orbit { 
-            position: absolute; top: 50%; left: 50%; 
-            border: 1.5px solid rgba(255, 255, 255, 0.15); border-radius: 50%; 
-            transform: translate(-50%, -50%); transform-style: preserve-3d; 
-            animation: spin linear infinite; 
-        }
+        @keyframes rotateOrbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        @keyframes spin { 
-            from { transform: translate(-50%, -50%) rotate(0deg); } 
-            to { transform: translate(-50%, -50%) rotate(360deg); } 
-        }
-
-        /* Palabras orbitando */
-        .word { 
-            position: absolute; color: white; font-weight: bold; font-size: 18px; 
-            text-shadow: 0 0 15px #ff007f; white-space: nowrap; 
-            transform: rotateX(-90deg) rotateY(-10deg); /* Corrige la inclinación para leerse */
-            left: 100%; top: 50%; 
-        }
-
-        /* Estrellas Fugaces */
-        .shooting-star {
-            position: absolute; height: 2px;
-            background: linear-gradient(90deg, #fff, transparent);
-            animation: shoot 2.5s linear infinite; opacity: 0;
-        }
-
-        @keyframes shoot {
-            0% { transform: translate(100vw, -10vh) rotate(-30deg); opacity: 0; }
-            10% { opacity: 1; }
-            40% { transform: translate(-50vw, 90vh) rotate(-30deg); opacity: 0; }
-            100% { opacity: 0; }
-        }
-
-        .lyrics { 
-            position: fixed; bottom: 50px; color: white; font-size: 1.5rem; 
-            text-align: center; width: 100%; text-shadow: 0 0 20px #ff007f; 
-            font-style: italic; display: none; font-weight: 300;
+        .word {
+            position: absolute; color: white; font-weight: bold; font-size: 24px;
+            text-shadow: 0 0 15px #ff007f; transform: rotateX(-90deg) translateX(-50%);
+            white-space: nowrap; left: 50%; top: -14px; font-style: italic;
         }
     </style>
 </head>
 <body>
 
-    <div id="play-overlay" onclick="startExperience()">
+    <div id="star-field"></div>
+
+    <div id="play-overlay" onclick="start()">
         <button class="btn-play">💖 VER MI UNIVERSO 💖</button>
     </div>
 
-    <div class="universe-3d" id="universe">
-        <div class="sun"></div>
+    <div class="universe" id="main-ui">
+        <div class="planet"></div>
+        <div class="orbit-system" id="system"></div>
     </div>
-    
-    <div class="lyrics" id="lyrics-text">"En Saturno viven los hijos que nunca tuvimos..."</div>
 
-    <audio id="bg-audio" loop preload="auto">
+    <audio id="music" loop preload="auto">
         <source src="musica.mp3" type="audio/mpeg">
-        <source src="https://files.catbox.moe/k37h9s.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        function startExperience() {
-            const audio = document.getElementById('bg-audio');
-            audio.play();
-            
-            document.getElementById('play-overlay').style.display = 'none';
-            document.getElementById('universe').style.display = 'block';
-            document.getElementById('lyrics-text').style.display = 'block';
-            
-            const frases = ["MI REYNA", "BONITA", "BELLA", "PRINCESA", "MI PLANETA", "HERMOSA", "MI TODO", "DULZURA", "MI VIDA", "TESORO", "MI CIELO", "ENCANTO"];
-            const universe = document.getElementById('universe');
-            
-            frases.forEach((texto, i) => {
-                const orbit = document.createElement('div');
-                orbit.className = 'orbit';
-                const radio = 250 + (i * 65);
-                orbit.style.width = radio + 'px'; 
-                orbit.style.height = radio + 'px';
-                orbit.style.animationDuration = (12 + i * 2.5) + 's';
-                orbit.style.animationDelay = `-${Math.random() * 20}s`;
+        // Estrellas estáticas separadas
+        const starField = document.getElementById('star-field');
+        for (let i = 0; i < 150; i++) {
+            const s = document.createElement('div');
+            s.className = 'static-star';
+            const size = Math.random() * 2 + 1 + 'px';
+            s.style.width = size; s.style.height = size;
+            s.style.top = Math.random() * 100 + '%';
+            s.style.left = Math.random() * 100 + '%';
+            starField.appendChild(s);
+        }
 
-                const word = document.createElement('div');
-                word.className = 'word'; 
-                word.innerText = texto;
-                if(i % 2 === 0) word.style.color = "#ffb6c1";
-                
-                orbit.appendChild(word);
-                universe.appendChild(orbit);
+        // Función para lanzar 7 estrellas fugaces separadas
+        function launchShootingStars() {
+            for (let i = 0; i < 7; i++) {
+                setTimeout(() => {
+                    const star = document.createElement('div');
+                    star.className = 'shooting-star';
+                    // Posiciones aleatorias para que salgan separadas
+                    star.style.top = Math.random() * 50 + '%';
+                    star.style.left = (Math.random() * -20) + '%'; 
+                    star.style.animation = `shooting ${Math.random() * 1 + 1.5}s linear forwards`;
+                    document.body.appendChild(star);
+                    setTimeout(() => star.remove(), 2500);
+                }, i * 800); // Retraso entre cada una para que no salgan juntas
+            }
+        }
+
+        function start() {
+            const audio = document.getElementById('music');
+            audio.play().catch(() => {
+                audio.muted = false;
+                audio.play();
             });
 
-            // Generador de estrellas fugaces
-            setInterval(() => {
-                const star = document.createElement('div');
-                star.className = 'shooting-star';
-                star.style.width = (Math.random() * 200 + 150) + 'px';
-                star.style.top = (Math.random() * 60) + '%';
-                star.style.left = (Math.random() * 100) + '%';
-                document.body.appendChild(star);
-                setTimeout(() => star.remove(), 2500);
-            }, 700);
+            document.getElementById('play-overlay').style.display = 'none';
+            document.getElementById('main-ui').style.display = 'flex';
+            
+            const frases = [
+                "MI REYNA", "BONITA", "BELLA", "HERMOSA", 
+                "MI TODO", "MI VIDA", "TESORO", "MI CIELO",
+                "MI LUZ", "MI DESTINO", "MI ÚNICA", "AMOR MÍO"
+            ];
+
+            const system = document.getElementById('system');
+
+            frases.forEach((t, i) => {
+                const orb = document.createElement('div');
+                orb.className = 'orbit';
+                const size = 300 + (i * 68); 
+                orb.style.width = size + 'px'; orb.style.height = size + 'px';
+                orb.style.animationDuration = (5 + (i * 1.5)) + 's';
+                const w = document.createElement('div');
+                w.className = 'word'; w.innerText = t;
+                orb.appendChild(w);
+                system.appendChild(orb);
+            });
+
+            // Lanza el grupo de 7 estrellas cada cierto tiempo
+            launchShootingStars();
+            setInterval(launchShootingStars, 8000);
         }
     </script>
 </body>
