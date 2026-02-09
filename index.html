@@ -3,174 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universo para Mi Reyna</title>
+    <title>Propuesta Nítida</title>
     <style>
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background: #000000;
-            overflow: hidden;
-            display: flex; justify-content: center; align-items: center;
-            font-family: 'Arial', sans-serif;
-            perspective: 1200px;
-        }
-
-        #star-field {
+        body { margin: 0; background: #000; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; font-family: 'Arial Black', sans-serif; touch-action: none; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        
+        #overlay-inicio {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0;
+            background: #000; z-index: 100; display: flex; justify-content: center; align-items: center;
         }
 
-        .static-star {
-            position: absolute; background: white; border-radius: 50%;
-            opacity: 0.8;
+        #btn-comenzar {
+            padding: 20px 40px; font-size: 1.5rem; background: #ff4d6d; color: white;
+            border: none; border-radius: 50px; cursor: pointer; font-weight: bold;
+            box-shadow: 0 0 30px #ff4d6d; animation: pulse 2s infinite;
         }
 
-        /* ESTRELLAS FUGACES INDIVIDUALES */
-        .shooting-star {
-            position: absolute;
-            height: 3px;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0), #ffffff);
-            border-radius: 999px;
-            filter: drop-shadow(0 0 10px #ffffff);
-            z-index: 5;
-            opacity: 0;
-            pointer-events: none;
+        #ui-layer { 
+            position: absolute; bottom: 10%; z-index: 10; text-align: center; 
+            display: none; opacity: 0; transition: opacity 0.8s; width: 100%;
         }
 
-        @keyframes shooting {
-            0% { transform: translateX(0) translateY(0) rotate(35deg); opacity: 0; width: 0; }
-            10% { opacity: 1; }
-            30% { width: 180px; opacity: 1; }
-            100% { transform: translateX(1000px) translateY(600px) rotate(35deg); opacity: 0; width: 0; }
-        }
-
-        #play-overlay {
-            position: fixed; z-index: 100; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.98); display: flex; justify-content: center; align-items: center;
-            cursor: pointer;
-        }
-
-        .btn-play {
-            padding: 15px 45px; font-size: 22px; background: #ff007f; border: none;
-            border-radius: 50px; color: white; box-shadow: 0 0 40px #ff007f; font-weight: bold;
-        }
-
-        .universe {
-            position: relative; width: 100%; height: 100%;
-            display: none; justify-content: center; align-items: center;
-            transform-style: preserve-3d; transform: scale(0.6); z-index: 10;
-        }
-
-        .planet {
-            position: absolute; width: 160px; height: 160px;
-            background: radial-gradient(circle at 30% 30%, #fff, #ffb6c1, #ff007f, #4b0026);
-            border-radius: 50%; z-index: 20;
-            box-shadow: 0 0 80px rgba(255, 0, 127, 0.9), inset -10px -10px 20px rgba(0,0,0,0.6);
-        }
-
-        .orbit-system {
-            position: absolute; width: 100%; height: 100%;
-            display: flex; justify-content: center; align-items: center;
-            transform: rotateX(75deg); transform-style: preserve-3d;
-        }
-
-        /* 12 ANILLOS VISIBLES */
-        .orbit {
-            position: absolute; 
-            border: 1.8px solid rgba(255, 255, 255, 0.3); 
-            border-radius: 50%; 
-            transform-style: preserve-3d;
-            animation: rotateOrbit linear infinite;
-        }
-
-        @keyframes rotateOrbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        .word {
-            position: absolute; color: white; font-weight: bold; font-size: 24px;
-            text-shadow: 0 0 15px #ff007f; transform: rotateX(-90deg) translateX(-50%);
-            white-space: nowrap; left: 50%; top: -14px; font-style: italic;
-        }
+        .buttons { display: flex; gap: 20px; justify-content: center; }
+        button { padding: 15px 35px; font-size: 1.2rem; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; }
+        #btn-si { background: #ff4d6d; color: white; box-shadow: 0 0 20px #ff4d6d; }
+        #btn-no { background: #333; color: #fff; position: relative; }
+        
+        #msg-guia { position: absolute; top: 12%; color: #ffb7c5; z-index: 5; text-align: center; width: 100%; font-size: 1.1rem; display: none; }
+        
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     </style>
 </head>
 <body>
 
-    <div id="star-field"></div>
-
-    <div id="play-overlay" onclick="start()">
-        <button class="btn-play">💖 VER MI UNIVERSO 💖</button>
+    <div id="overlay-inicio">
+        <button id="btn-comenzar" onclick="iniciarTodo()">Abrir Regalo 🎁</button>
     </div>
 
-    <div class="universe" id="main-ui">
-        <div class="planet"></div>
-        <div class="orbit-system" id="system"></div>
-    </div>
-
-    <audio id="music" loop preload="auto">
+    <audio id="musica" loop preload="auto">
         <source src="musica.mp3" type="audio/mpeg">
     </audio>
 
+    <div id="msg-guia">Toca la flor 🌸</div>
+
+    <div id="ui-layer">
+        <div class="buttons">
+            <button id="btn-si" onclick="celebrar()">¡SÍ!</button>
+            <button id="btn-no" onmouseover="huir(this)" onclick="huir(this)">No</button>
+        </div>
+    </div>
+
+    <canvas id="canvas1"></canvas>
+
     <script>
-        // Estrellas estáticas separadas
-        const starField = document.getElementById('star-field');
-        for (let i = 0; i < 150; i++) {
-            const s = document.createElement('div');
-            s.className = 'static-star';
-            const size = Math.random() * 2 + 1 + 'px';
-            s.style.width = size; s.style.height = size;
-            s.style.top = Math.random() * 100 + '%';
-            s.style.left = Math.random() * 100 + '%';
-            starField.appendChild(s);
+        const canvas = document.getElementById('canvas1');
+        const ctx = canvas.getContext('2d');
+        const audio = document.getElementById('musica');
+        let particles = [];
+        let stage = -1; 
+        const dpr = window.devicePixelRatio || 1;
+
+        function iniciarTodo() {
+            document.getElementById('overlay-inicio').style.display = 'none';
+            document.getElementById('msg-guia').style.display = 'block';
+            audio.play().catch(() => {});
+            stage = 0;
+            setSize();
         }
 
-        // Función para lanzar 7 estrellas fugaces separadas
-        function launchShootingStars() {
-            for (let i = 0; i < 7; i++) {
-                setTimeout(() => {
-                    const star = document.createElement('div');
-                    star.className = 'shooting-star';
-                    // Posiciones aleatorias para que salgan separadas
-                    star.style.top = Math.random() * 50 + '%';
-                    star.style.left = (Math.random() * -20) + '%'; 
-                    star.style.animation = `shooting ${Math.random() * 1 + 1.5}s linear forwards`;
-                    document.body.appendChild(star);
-                    setTimeout(() => star.remove(), 2500);
-                }, i * 800); // Retraso entre cada una para que no salgan juntas
+        function setSize() {
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            ctx.scale(dpr, dpr);
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+            if(stage >= 0) init();
+        }
+
+        class Particula {
+            constructor(fx, fy, tx, ty, cx, cy) {
+                this.x = Math.random() * window.innerWidth;
+                this.y = Math.random() * window.innerHeight;
+                this.fx = fx; this.fy = fy;
+                this.tx = tx; this.ty = ty;
+                this.cx = cx; this.cy = cy;
+                this.vx = (Math.random() - 0.5) * 40;
+                this.vy = (Math.random() - 0.5) * 40;
+                this.color = '#ffb7c5';
+                this.size = Math.random() * 1.5 + 1;
+            }
+            actualizar() {
+                let ease = 0.12;
+                if (stage === 0) {
+                    this.x += (this.fx - this.x) * 0.08;
+                    this.y += (this.fy - this.y) * 0.08;
+                } else if (stage === 1) {
+                    this.x += (this.tx - this.x) * ease;
+                    this.y += (this.ty - this.y) * ease;
+                    this.color = '#ff69b4';
+                } else if (stage === 2) {
+                    this.x += this.vx; this.y += this.vy;
+                    this.vx *= 0.96; this.vy *= 0.96;
+                    this.vy += 0.15; 
+                } else if (stage === 3) {
+                    this.x += (this.cx - this.x) * 0.1;
+                    this.y += (this.cy - this.y) * 0.1;
+                    this.color = '#ffffff';
+                }
+            }
+            dibujar() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
             }
         }
 
-        function start() {
-            const audio = document.getElementById('music');
-            audio.play().catch(() => {
-                audio.muted = false;
-                audio.play();
-            });
-
-            document.getElementById('play-overlay').style.display = 'none';
-            document.getElementById('main-ui').style.display = 'flex';
+        function obtenerPuntos(textos, fontSize, yOffset) {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = window.innerWidth;
+            tempCanvas.height = window.innerHeight;
             
-            const frases = [
-                "MI REYNA", "BONITA", "BELLA", "HERMOSA", 
-                "MI TODO", "MI VIDA", "TESORO", "MI CIELO",
-                "MI LUZ", "MI DESTINO", "MI ÚNICA", "AMOR MÍO"
-            ];
-
-            const system = document.getElementById('system');
-
-            frases.forEach((t, i) => {
-                const orb = document.createElement('div');
-                orb.className = 'orbit';
-                const size = 300 + (i * 68); 
-                orb.style.width = size + 'px'; orb.style.height = size + 'px';
-                orb.style.animationDuration = (5 + (i * 1.5)) + 's';
-                const w = document.createElement('div');
-                w.className = 'word'; w.innerText = t;
-                orb.appendChild(w);
-                system.appendChild(orb);
+            tempCtx.fillStyle = "white";
+            tempCtx.font = `900 ${fontSize}px sans-serif`;
+            tempCtx.textAlign = 'center';
+            tempCtx.textBaseline = 'middle';
+            
+            const spacing = fontSize * 1.2;
+            const startY = (tempCanvas.height / 2) + yOffset;
+            
+            textos.forEach((t, i) => {
+                tempCtx.fillText(t, tempCanvas.width / 2, startY + (i * spacing) - ((textos.length-1)*spacing/2));
             });
-
-            // Lanza el grupo de 7 estrellas cada cierto tiempo
-            launchShootingStars();
-            setInterval(launchShootingStars, 8000);
+            
+            const data = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height).data;
+            let puntos = [];
+            // Escaneo de alta densidad (cada 3 píxeles)
+            for (let y = 0; y < tempCanvas.height; y += 3) {
+                for (let x = 0; x < tempCanvas.width; x += 3) {
+                    if (data[(y * tempCanvas.width + x) * 4 + 3] > 150) puntos.push({x, y});
+                }
+            }
+            return puntos;
         }
+
+        function init() {
+            particles = [];
+            const isMob = window.innerWidth < 600;
+            const fontSize = isMob ? 38 : 65;
+            
+            const p1 = obtenerPuntos(isMob ? ["¿QUIERES", "SER MI", "MEJOR", "AMIGA?"] : ["¿QUIERES SER MI MEJOR AMIGA?"], fontSize, -80);
+            const p2 = obtenerPuntos(isMob ? ["SABÍA QUE", "DIRÍAS", "QUE SÍII"] : ["SABÍA QUE DIRÍAS QUE SÍII"], fontSize, -60);
+            
+            p1.forEach((pt, i) => {
+                let t = i * 0.15;
+                let r = (isMob ? 120 : 220) * Math.sin(5 * t);
+                let fx = window.innerWidth/2 + r * Math.cos(t);
+                let fy = (window.innerHeight/2 - 60) + r * Math.sin(t);
+                let c = p2[i % p2.length];
+                particles.push(new Particula(fx, fy, pt.x, pt.y, c.x, c.y));
+            });
+        }
+
+        function animar() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+            ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+            if (stage >= 0) {
+                particles.forEach(p => { p.actualizar(); p.dibujar(); });
+            }
+            requestAnimationFrame(animar);
+        }
+
+        const handleInteraction = (e) => {
+            if(stage === 0 && e.target.id !== 'btn-comenzar') {
+                stage = 1;
+                document.getElementById('ui-layer').style.display = 'block';
+                setTimeout(() => document.getElementById('ui-layer').style.opacity = '1', 50);
+                document.getElementById('msg-guia').style.display = 'none';
+            }
+        };
+
+        window.addEventListener('touchstart', handleInteraction);
+        window.addEventListener('mousedown', handleInteraction);
+
+        function celebrar() {
+            stage = 2;
+            document.getElementById('ui-layer').style.display = 'none';
+            particles.forEach(p => {
+                p.color = `hsl(${Math.random()*360}, 100%, 70%)`;
+                p.vx = (Math.random()-0.5)*50; p.vy = (Math.random()-0.5)*50;
+            });
+            setTimeout(() => { stage = 3; }, 3000);
+        }
+
+        function huir(btn) {
+            btn.style.position = 'absolute';
+            btn.style.top = Math.random()*70+15+'%'; btn.style.left = Math.random()*70+15+'%';
+        }
+
+        window.addEventListener('resize', setSize);
+        animar();
     </script>
 </body>
 </html>
